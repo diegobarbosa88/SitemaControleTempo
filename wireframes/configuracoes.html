@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configurações - Sistema de Controle de Tempo</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background-color: #2c3e50;
+            color: white;
+            padding-top: 20px;
+            transition: all 0.3s;
+        }
+        
+        .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid #3d5166;
+            text-align: center;
+        }
+        
+        .sidebar-header img {
+            max-width: 150px;
+        }
+        
+        .sidebar-menu {
+            padding: 20px 0;
+        }
+        
+        .menu-item {
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            color: #ecf0f1;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .menu-item:hover, .menu-item.active {
+            background-color: #3498db;
+        }
+        
+        .menu-item i {
+            margin-right: 10px;
+            font-size: 18px;
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .page-title {
+            font-size: 24px;
+            color: #2c3e50;
+            margin: 0;
+        }
+        
+        .user-menu {
+            display: flex;
+            align-items: center;
+        }
+        
+        .user-menu img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .user-name {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .user-role {
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+        
+        /* Settings Tabs */
+        .settings-tabs {
+            display: flex;
+            border-bottom: 1px solid #ecf0f1;
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            padding: 12px 20px;
+            font-weight: 600;
+            color: #7f8c8d;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .tab.active {
+            color: #3498db;
+            border-bottom-color: #3498db;
+        }
+        
+        .tab:hover:not(.active) {
+            color: #2c3e50;
+            border-bottom-color: #ecf0f1;
+        }
+        
+        /* Settings Sections */
+        .settings-section {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin: 0 0 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .settings-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .settings-label {
+            font-size: 14px;
+            color: #7f8c8d;
+            margin-bottom: 8px;
+        }
+        
+        .settings-input, .settings-select, .settings-textarea {
+            padding: 10px;
+            border: 1px solid #ecf0f1;
+            border-radius: 5px;
+            font-size: 14px;
+            color: #2c3e50;
+        }
+        
+        .settings-input:focus, .settings-select:focus, .settings-textarea:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+        
+        .settings-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .settings-checkbox {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .settings-checkbox input {
+            margin-right: 10px;
+        }
+        
+        .settings-checkbox label {
+            font-size: 14px;
+            color: #2c3e50;
+        }
+        
+        .settings-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .settings-button {
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .save-button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+        }
+        
+        .save-button:hover {
+            background-color: #2980b9;
+        }
+        
+        .cancel-button {
+            background-color: white;
+            color: #7f8c8d;
+            border: 1px solid #ecf0f1;
+        }
+        
+        .cancel-button:hover {
+            border-color: #7f8c8d;
+        }
+        
+        /* Location Settings */
+        .location-list {
+            margin-bottom: 20px;
+        }
+        
+        .location-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        
+        .location-item:last-child {
+            border-bottom: none;
+        }
+        
+        .location-info {
+            flex: 1;
+        }
+        
+        .location-name {
+            font-weight: 600;
+            color: #2c3e50;
+            margin: 0 0 5px;
+        }
+        
+        .location-address {
+            font-size: 14px;
+            color: #7f8c8d;
+            margin: 0;
+        }
+        
+        .location-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .location-action {
+            color: #7f8c8d;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .location-action:hover {
+            color: #3498db;
+        }
+        
+        .add-location {
+            display: flex;
+            align-items: center;
+            color: #3498db;
+            font-weight: 600;
+            cursor: pointer;
+            gap: 8px;
+        }
+        
+        /* Toggle Switch */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .toggle-slider {
+            background-color: #3498db;
+        }
+        
+        input:checked + .toggle-slider:before {
+            transform: translateX(26px);
+        }
+        
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                position: fixed;
+                bottom: 0;
+                z-index: 100;
+                height: 60px;
+                padding-top: 0;
+            }
+            
+            .sidebar-header {
+                display: none;
+            }
+            
+            .sidebar-menu {
+                display: flex;
+                justify-content: space-around;
+                padding: 0;
+            }
+            
+            .menu-item {
+                flex-direction: column;
+                padding: 10px;
+                font-size: 12px;
+            }
+            
+            .menu-item i {
+                margin-right: 0;
+                margin-bottom: 5px;
+            }
+            
+            .main-content {
+                margin-bottom: 60px;
+            }
+            
+            .settings-tabs {
+                overflow-x: auto;
+                white-space: nowrap;
+                padding-bottom: 5px;
+            }
+            
+            .settings-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <img src="img/logo.png" alt="Logo Sistema de Controle de Tempo">
+            </div>
+            
+            <div class="sidebar-menu">
+                <a href="dashboard.html" class="menu-item">
+                    <i>📊</i> Dashboard
+                </a>
+                <a href="registro_ponto.html" class="menu-item">
+                    <i>⏱️</i> Registro de Ponto
+                </a>
+                <a href="gestao_funcionarios.html" class="menu-item">
+                    <i>👥</i> Funcionários
+                </a>
+                <a href="relatorios.html" class="menu-item">
+                    <i>📈</i> Relatórios
+                </a>
+                <a href="configuracoes.html" class="menu-item active">
+                    <i>⚙️</i> Configurações
+                </a>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="header">
+                <h1 class="page-title">Configurações</h1>
+                
+                <div class="user-menu">
+                    <img src="img/user-avatar.png" alt="Avatar do Usuário">
+                    <div class="user-info">
+                        <span class="user-name">João Silva</span>
+                        <span class="user-role">Administrador</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Settings Tabs -->
+            <div class="settings-tabs">
+                <div class="tab active">Geral</div>
+                <div class="tab">Locais de Trabalho</div>
+                <div class="tab">Métodos de Registro</div>
+                <div class="tab">Notificações</div>
+                <div class="tab">Segurança</div>
+            </div>
+            
+            <!-- General Settings -->
+            <div class="settings-section">
+                <h2 class="section-title">Configurações Gerais</h2>
+                
+                <div class="settings-grid">
+                    <div class="settings-group">
+                        <label class="settings-label">Nome da Empresa</label>
+                        <input type="text" class="settings-input" value="Minha Empresa">
+                    </div>
+                    
+                    <div class="settings-group">
+                        <label class="settings-label">Email de Contato</label>
+                        <input type="email" class="settings-input" value="contato@minhaempresa.com">
+                    </div>
+                    
+                    <div class="settings-group">
+                        <label class="settings-label">Fuso Horário</label>
+                        <select class="settings-select">
+                            <option>America/Sao_Paulo (GMT-3)</option>
+                            <option>America/Manaus (GMT-4)</option>
+                            <option>America/Bahia (GMT-3)</option>
+                            <option>America/Noronha (GMT-2)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="settings-group">
+                        <label class="settings-label">Formato de Data</label>
+                        <select class="settings-select">
+                            <option>DD/MM/AAAA</option>
+                            <option>MM/DD/AAAA</option>
+                            <option>AAAA-MM-DD</option>
+                        </select>
+                    </div>
+                    
+                    <div class="settings-group">
+                        <label class="settings-label">Formato de Hora</label>
+                        <select class="settings-select">
+                            <option>24 horas</option>
+                            <option>12 horas (AM/PM)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="settings-group">
+                        <label class="settings-label">Dias Úteis</label>
+                        <div class="settings-checkbox">
+                            <input type="checkbox" id="monday" checked>
+                            <label for="monday">Segunda-feira</label>
+                        </div>
+                        <div class="settings-checkbox">
+                            <input type="checkbox" id="tuesday" checked>
+                            <label for="tuesday">Terça-feira</label>
+                        </div>
+                        <div class="settings-checkbox">
+                            <input type="checkbox" id="wednesday" checked>
+                            <label for="wednesday">Quarta-feira</label>
+                        </div>
+                        <div class="settings-checkbox">
+                            <input type="checkbox" id="thursday" checked>
+                            <label for="thursday">Quinta-feira</label>
+                        </div>
+                        <div class="settings-checkbox">
+                            <input type="checkbox" id="friday" checked>
+                            <label for="friday">Sexta-feira</label>
+                        </div>
+                        <div class="settings-checkbox">
+                            <input type="checkbox" id="saturday">
+                            <label for="saturday">Sábado</label>
+                        </div>
+                        <div class="settings-checkbox">
+                            <input type="checkbox" id="sunday">
+                            <label for="sunday">Domingo</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="settings-actions">
+                    <button class="settings-button cancel-button">Cancelar</button>
+                    <button class="settings-button save-button">Salvar Alterações</button>
+                </div>
+            </div>
+            
+            <!-- Work Locations -->
+            <div class="settings-section">
+                <h2 class="section-title">Locais de Trabalho</h2>
+                
+                <div class="location-list">
+                    <div class="location-item">
+                        <div class="location-info">
+                            <h3 class="location-name">Escritório Central</h3>
+                            <p class="location-address">Av. Paulista, 1000 - São Paulo, SP</p>
+                        </div>
+                        <div class="location-actions">
+                            <span class="location-action">✏️</span>
+                            <span class="location-action">🗑️</span>
+                        </div>
+                    </div>
+                    
+                    <div class="location-item">
+                        <div class="location-info">
+                            <h3 class="location-name">Filial Rio de Janeiro</h3>
+                            <p class="location-address">Av. Atlântica, 500 - Rio de Janeiro, RJ</p>
+                        </div>
+                        <div class="location-actions">
+                            <span class="location-action">✏️</span>
+                            <span class="location-action">🗑️</span>
+                        </div>
+                    </div>
+                    
+                    <div class="location-item">
+                        <div class="location-info">
+                            <h3 class="location-name">Home Office</h3>
+                            <p class="location-address">Qualquer localização</p>
+                        </div>
+                        <div class="location-actions">
+                            <span class="location-action">✏️</span>
+                            <span class="location-action">🗑️</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="add-location">
+                    <i>➕</i> Adicionar Novo Local
+                </div>
+            </div>
+            
+            <!-- Registration Methods -->
+            <div class="settings-section">
+                <h2 class="section-title">Métodos de Registro</h2>
+                
+                <div class="settings-grid">
+                    <div class="settings-group">
+                        <div class="settings-checkbox">
+                            <label class="toggle-switch">
+                                <input type="checkbox" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <label style="margin-left: 15px;">Web</label>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-group">
+                        <div class="settings-checkbox">
+                            <label class="toggle-switch">
+                                <input type="checkbox" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <label style="margin-left: 15px;">Aplicativo Móvel</label>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-group">
+                        <div class="settings-checkbox">
+                            <label class="toggle-switch">
+                                <input type="checkbox" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <label style="margin-left: 15px;">Geolocalização</label>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-group">
+                        <div class="settings-checkbox">
+                            <label class="toggle-switch">
+                                <input type="checkbox" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <label style="margin-left: 15px;">Reconhecimento Facial</label>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-group">
+                        <div class="settings-checkbox">
+                            <label class="toggle-switch">
+                                <input type="checkbox" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <label style="margin-left: 15px;">QR Code</label>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-group">
+                        <div class="settings-checkbox">
+                            <label class="toggle-switch">
+                                <input type="checkbox" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <label style="margin-left: 15px;">PIN</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="settings-actions">
+                    <button class="settings-button cancel-button">Cancelar</button>
+                    <button class="settings-button save-button">Salvar Alterações</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="js/configuracoes.js"></script>
+</body>
+</html>

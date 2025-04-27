@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Sistema de Controle de Tempo</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background-color: #2c3e50;
+            color: white;
+            padding-top: 20px;
+            transition: all 0.3s;
+        }
+        
+        .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid #3d5166;
+            text-align: center;
+        }
+        
+        .sidebar-header img {
+            max-width: 150px;
+        }
+        
+        .sidebar-menu {
+            padding: 20px 0;
+        }
+        
+        .menu-item {
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            color: #ecf0f1;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .menu-item:hover, .menu-item.active {
+            background-color: #3498db;
+        }
+        
+        .menu-item i {
+            margin-right: 10px;
+            font-size: 18px;
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .page-title {
+            font-size: 24px;
+            color: #2c3e50;
+            margin: 0;
+        }
+        
+        .user-menu {
+            display: flex;
+            align-items: center;
+        }
+        
+        .user-menu img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .user-name {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .user-role {
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+        
+        /* Dashboard Cards */
+        .dashboard-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin: 0;
+        }
+        
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            background-color: #3498db;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+        }
+        
+        .card-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin: 0 0 5px;
+        }
+        
+        .card-description {
+            font-size: 14px;
+            color: #7f8c8d;
+            margin: 0;
+        }
+        
+        /* Clock In/Out Section */
+        .clock-section {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .clock-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .current-time {
+            font-size: 36px;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+        
+        .current-date {
+            font-size: 16px;
+            color: #7f8c8d;
+        }
+        
+        .clock-actions {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .clock-button {
+            padding: 12px 24px;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .clock-in {
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+        }
+        
+        .clock-out {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+        }
+        
+        .pause {
+            background-color: #f39c12;
+            color: white;
+            border: none;
+        }
+        
+        /* Recent Activity */
+        .recent-activity {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        
+        .activity-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .activity-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin: 0;
+        }
+        
+        .view-all {
+            color: #3498db;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        
+        .activity-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .activity-item {
+            padding: 15px 0;
+            border-bottom: 1px solid #ecf0f1;
+            display: flex;
+            align-items: center;
+        }
+        
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+        
+        .activity-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 15px;
+        }
+        
+        .clock-in-icon {
+            background-color: rgba(46, 204, 113, 0.2);
+            color: #2ecc71;
+        }
+        
+        .clock-out-icon {
+            background-color: rgba(231, 76, 60, 0.2);
+            color: #e74c3c;
+        }
+        
+        .pause-icon {
+            background-color: rgba(243, 156, 18, 0.2);
+            color: #f39c12;
+        }
+        
+        .activity-details {
+            flex: 1;
+        }
+        
+        .activity-description {
+            font-size: 14px;
+            color: #2c3e50;
+            margin: 0 0 5px;
+        }
+        
+        .activity-time {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin: 0;
+        }
+        
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                position: fixed;
+                bottom: 0;
+                z-index: 100;
+                height: 60px;
+                padding-top: 0;
+            }
+            
+            .sidebar-header {
+                display: none;
+            }
+            
+            .sidebar-menu {
+                display: flex;
+                justify-content: space-around;
+                padding: 0;
+            }
+            
+            .menu-item {
+                flex-direction: column;
+                padding: 10px;
+                font-size: 12px;
+            }
+            
+            .menu-item i {
+                margin-right: 0;
+                margin-bottom: 5px;
+            }
+            
+            .main-content {
+                margin-bottom: 60px;
+            }
+            
+            .dashboard-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .clock-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .clock-actions {
+                margin-top: 15px;
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .clock-button {
+                padding: 10px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <img src="img/logo.png" alt="Logo Sistema de Controle de Tempo">
+            </div>
+            
+            <div class="sidebar-menu">
+                <a href="dashboard.html" class="menu-item active">
+                    <i>📊</i> Dashboard
+                </a>
+                <a href="registro_ponto.html" class="menu-item">
+                    <i>⏱️</i> Registro de Ponto
+                </a>
+                <a href="gestao_funcionarios.html" class="menu-item">
+                    <i>👥</i> Funcionários
+                </a>
+                <a href="relatorios.html" class="menu-item">
+                    <i>📈</i> Relatórios
+                </a>
+                <a href="configuracoes.html" class="menu-item">
+                    <i>⚙️</i> Configurações
+                </a>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="header">
+                <h1 class="page-title">Dashboard</h1>
+                
+                <div class="user-menu">
+                    <img src="img/user-avatar.png" alt="Avatar do Usuário">
+                    <div class="user-info">
+                        <span class="user-name">João Silva</span>
+                        <span class="user-role">Administrador</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Dashboard Cards -->
+            <div class="dashboard-cards">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Funcionários Ativos</h2>
+                        <div class="card-icon">👥</div>
+                    </div>
+                    <p class="card-value">8/10</p>
+                    <p class="card-description">Funcionários atualmente trabalhando</p>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Horas Trabalhadas Hoje</h2>
+                        <div class="card-icon">⏱️</div>
+                    </div>
+                    <p class="card-value">32h 15m</p>
+                    <p class="card-description">Total de horas da equipe</p>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Ausências</h2>
+                        <div class="card-icon">🏖️</div>
+                    </div>
+                    <p class="card-value">2</p>
+                    <p class="card-description">Funcionários ausentes hoje</p>
+                </div>
+            </div>
+            
+            <!-- Clock In/Out Section -->
+            <div class="clock-section">
+                <div class="clock-header">
+                    <div>
+                        <div class="current-time">09:45:23</div>
+                        <div class="current-date">Sexta-feira, 25 de Abril de 2025</div>
+                    </div>
+                    
+                    <div class="clock-actions">
+                        <button class="clock-button clock-in">
+                            <i>▶️</i> Entrada
+                        </button>
+                        <button class="clock-button pause">
+                            <i>⏸️</i> Pausa
+                        </button>
+                        <button class="clock-button clock-out">
+                            <i>⏹️</i> Saída
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Recent Activity -->
+            <div class="recent-activity">
+                <div class="activity-header">
+                    <h2 class="activity-title">Atividade Recente</h2>
+                    <a href="#" class="view-all">Ver Tudo</a>
+                </div>
+                
+                <ul class="activity-list">
+                    <li class="activity-item">
+                        <div class="activity-icon clock-in-icon">▶️</div>
+                        <div class="activity-details">
+                            <p class="activity-description">Maria Oliveira registrou entrada</p>
+                            <p class="activity-time">Hoje, 09:02</p>
+                        </div>
+                    </li>
+                    
+                    <li class="activity-item">
+                        <div class="activity-icon clock-in-icon">▶️</div>
+                        <div class="activity-details">
+                            <p class="activity-description">Carlos Santos registrou entrada</p>
+                            <p class="activity-time">Hoje, 08:55</p>
+                        </div>
+                    </li>
+                    
+                    <li class="activity-item">
+                        <div class="activity-icon pause-icon">⏸️</div>
+                        <div class="activity-details">
+                            <p class="activity-description">Ana Pereira iniciou pausa</p>
+                            <p class="activity-time">Hoje, 08:30</p>
+                        </div>
+                    </li>
+                    
+                    <li class="activity-item">
+                        <div class="activity-icon clock-out-icon">⏹️</div>
+                        <div class="activity-details">
+                            <p class="activity-description">Pedro Almeida registrou saída</p>
+                            <p class="activity-time">Ontem, 18:05</p>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <script src="js/dashboard.js"></script>
+</body>
+</html>

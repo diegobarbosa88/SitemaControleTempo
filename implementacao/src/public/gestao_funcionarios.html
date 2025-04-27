@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão de Funcionários - Sistema de Controle de Tempo</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .search-box {
+            display: flex;
+            align-items: center;
+            background-color: white;
+            border-radius: 5px;
+            padding: 8px 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 500px;
+        }
+        
+        .search-box input {
+            border: none;
+            outline: none;
+            flex: 1;
+            padding: 5px;
+            font-size: 14px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-select {
+            padding: 8px 15px;
+            border: 1px solid #ecf0f1;
+            border-radius: 5px;
+            font-size: 14px;
+            color: #2c3e50;
+            background-color: white;
+        }
+        
+        .employee-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        
+        .employee-table th {
+            text-align: left;
+            padding: 12px 15px;
+            background-color: #f8f9fa;
+            color: #7f8c8d;
+            font-weight: 600;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        
+        .employee-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        
+        .employee-table tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .employee-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .employee-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 15px;
+            object-fit: cover;
+        }
+        
+        .employee-name {
+            font-weight: 600;
+            color: #2c3e50;
+            margin: 0 0 3px;
+        }
+        
+        .employee-email {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin: 0;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .status-active {
+            background-color: rgba(46, 204, 113, 0.2);
+            color: #2ecc71;
+        }
+        
+        .status-inactive {
+            background-color: rgba(231, 76, 60, 0.2);
+            color: #e74c3c;
+        }
+        
+        .status-vacation {
+            background-color: rgba(52, 152, 219, 0.2);
+            color: #3498db;
+        }
+        
+        .status-leave {
+            background-color: rgba(243, 156, 18, 0.2);
+            color: #f39c12;
+        }
+        
+        .tag {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-right: 5px;
+            margin-bottom: 5px;
+            background-color: #f8f9fa;
+            color: #7f8c8d;
+        }
+        
+        .action-icon {
+            color: #7f8c8d;
+            cursor: pointer;
+            margin-right: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        .action-icon:hover {
+            color: #3498db;
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .page-info {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+        
+        .page-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .page-button {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .page-button.active {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        .page-button:not(.active) {
+            background-color: white;
+            color: #7f8c8d;
+            border: 1px solid #ecf0f1;
+        }
+        
+        .page-button:not(.active):hover {
+            border-color: #3498db;
+            color: #3498db;
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            overflow: auto;
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 50px auto;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 600px;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin: 0;
+        }
+        
+        .modal-close {
+            font-size: 24px;
+            color: #7f8c8d;
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+        
+        .modal-body {
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .form-input, .form-select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ecf0f1;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        .form-input:focus, .form-select:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+        
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="main-content">
+            <div class="header">
+                <h1 class="page-title">Gestão de Funcionários</h1>
+                <div id="user-info" class="user-menu">
+                    <!-- Preenchido via JavaScript -->
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="search-box">
+                    <i>🔍</i>
+                    <input type="text" id="search-input" placeholder="Buscar funcionários...">
+                </div>
+                
+                <div class="action-buttons">
+                    <button id="btn-new-employee" class="button primary-button">
+                        <i>➕</i> Novo Funcionário
+                    </button>
+                    <button id="btn-export" class="button secondary-button">
+                        <i>⬇️</i> Exportar
+                    </button>
+                </div>
+                
+                <div class="filters">
+                    <select id="filter-department" class="filter-select">
+                        <option value="">Todos os Departamentos</option>
+                        <!-- Preenchido via JavaScript -->
+                    </select>
+                    
+                    <select id="filter-status" class="filter-select">
+                        <option value="">Todos os Status</option>
+                        <option value="Ativo">Ativo</option>
+                        <option value="Inativo">Inativo</option>
+                        <option value="Férias">Férias</option>
+                        <option value="Licença">Licença</option>
+                    </select>
+                    
+                    <select id="filter-tag" class="filter-select">
+                        <option value="">Todas as Tags</option>
+                        <!-- Preenchido via JavaScript -->
+                    </select>
+                </div>
+                
+                <table class="employee-table">
+                    <thead>
+                        <tr>
+                            <th>Funcionário</th>
+                            <th>Departamento</th>
+                            <th>Tags</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="employee-list">
+                        <!-- Preenchido via JavaScript -->
+                        <tr>
+                            <td colspan="5" style="text-align: center;">Carregando funcionários...</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div class="pagination">
+                    <div id="page-info" class="page-info">
+                        Mostrando 0-0 de 0 funcionários
+                    </div>
+                    
+                    <div id="page-controls" class="page-controls">
+                        <!-- Preenchido via JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal de Funcionário -->
+    <div id="employee-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-title" class="modal-title">Novo Funcionário</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            
+            <div class="modal-body">
+                <form id="employee-form">
+                    <input type="hidden" id="employee-id">
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="employee-name">Nome</label>
+                        <input type="text" id="employee-name" class="form-input" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="employee-email">Email</label>
+                        <input type="email" id="employee-email" class="form-input" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="employee-password">Senha</label>
+                        <input type="password" id="employee-password" class="form-input">
+                        <small>Deixe em branco para manter a senha atual (ao editar)</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="employee-phone">Telefone</label>
+                        <input type="tel" id="employee-phone" class="form-input">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="employee-position">Cargo</label>
+                        <input type="text" id="employee-position" class="form-input">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="employee-department">Departamento</label>
+                        <select id="employee-department" class="form-select">
+                            <option value="">Selecione um departamento</option>
+                            <!-- Preenchido via JavaScript -->
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="employee-hire-date">Data de Contratação</label>
+                        <input type="date" id="employee-hire-date" class="form-input">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="employee-status">Status</label>
+                        <select id="employee-status" class="form-select">
+                            <option value="Ativo">Ativo</option>
+                            <option value="Inativo">Inativo</option>
+                            <option value="Férias">Férias</option>
+                            <option value="Licença">Licença</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="employee-hours">Jornada Contratada (horas/semana)</label>
+                        <input type="number" id="employee-hours" class="form-input" min="1" max="168">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="employee-access">Nível de Acesso</label>
+                        <select id="employee-access" class="form-select">
+                            <option value="Funcionário">Funcionário</option>
+                            <option value="Gestor">Gestor</option>
+                            <option value="Admin">Administrador</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="modal-footer">
+                <button class="button secondary-button" onclick="closeModal()">Cancelar</button>
+                <button id="btn-save-employee" class="button primary-button">Salvar</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="js/api.js"></script>
+    <script>
+        // Variáveis globais
+        let employees = [];
+        let departments = [];
+        let tags = [];
+        let currentPage = 1;
+        let itemsPerPage = 10;
+        let filteredEmployees = [];
+        
+        // Verificar autenticação
+        async function verificarAutenticacao() {
+            const autenticado = await window.api.verificarAutenticacao();
+            if (!autenticado) {
+                window.location.href = 'login.html';
+            }
+        }
+        
+        // Atualizar informações do usuário
+        function atualizarInfoUsuario() {
+            const usuario = window.api.obterUsuarioLogado();
+            if (usuario) {
+                document.getElementById('user-info').innerHTML = `
+                    <img src="${usuario.foto || 'img/user-avatar.png'}" alt="Avatar">
+                    <div class="user-info">
+                        <span class="user-name">${usuario.nome}</span>
+                        <span class="user-role">${usuario.cargo || usuario.nivel_acesso}</span>
+                    </div>
+                `;
+            }
+        }
+        
+        // Carregar funcionários
+        async function carregarFuncionarios() {
+            try {
+                const response = await fetch('/api/funcionarios', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.mensagem || 'Erro ao carregar funcionários');
+                }
+                
+                employees = data.funcionarios;
+                filteredEmployees = [...employees];
+                
+                aplicarFiltros();
+            } catch (error) {
+                console.error('Erro ao carregar funcionários:', error);
+                alert('Erro ao carregar funcionários. Por favor, tente novamente.');
+            }
+        }
+        
+        // Carregar departamentos
+        async function carregarDepartamentos() {
+            try {
+                const response = await fetch('/api/departamentos', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.mensagem || 'Erro ao carregar departamentos');
+                }
+                
+                departments = data.departamentos;
+                
+                // Preencher select de departamentos no filtro
+                const filterDepartment = document.getElementById('filter-department');
+                filterDepartment.innerHTML = '<option value="">Todos os Departamentos</option>';
+                
+                departments.forEach(department => {
+                    filterDepartment.innerHTML += `<option value="${department.id}">${department.nome}</option>`;
+                });
+                
+                // Preencher select de departamentos no formulário
+                const employeeDepartment = document.getElementById('employee-department');
+                employeeDepartment.innerHTML = '<option value="">Selecione um departamento</option>';
+                
+                departments.forEach(department => {
+                    employeeDepartment.innerHTML += `<option value="${department.id}">${department.nome}</option>`;
+                });
+            } catch (error) {
+                console.error('Erro ao carregar departamentos:', error);
+                alert('Erro ao carregar departamentos. Por favor, tente novamente.');
+            }
+        }
+        
+        // Carregar tags
+        async function carregarTags() {
+            try {
+                const response = await fetch('/api/tags', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.mensagem || 'Erro ao carregar tags');
+                }
+                
+                tags = data.tags;
+                
+                // Preencher select de tags
+                const filterTag = document.getElementById('filter-tag');
+                filterTag.innerHTML = '<option value="">Todas as Tags</option>';
+                
+                tags.forEach(tag => {
+                    filterTag.innerHTML += `<option value="${tag.id}">${tag.nome}</option>`;
+                });
+            } catch (error) {
+                console.error('Erro ao carregar tags:', error);
+                alert('Erro ao carregar tags. Por favor, tente novamente.');
+            }
+        }
+        
+        // Aplicar filtros
+        function aplicarFiltros() {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            const departmentFilter = document.getElementById('filter-department').value;
+            const statusFilter = document.getElementById('filter-status').value;
+            const tagFilter = document.getElementById('filter-tag').value;
+            
+            filteredEmployees = employees.filter(employee => {
+                // Filtro de busca
+                const matchesSearch = 
+                    employee.nome.toLowerCase().includes(searchTerm) ||
+                    employee.email.toLowerCase().includes(searchTerm) ||
+                    (employee.cargo && employee.cargo.toLowerCase().includes(searchTerm));
+                
+                // Filtro de departamento
+                const matchesDepartment = !departmentFilter || employee.departamento_id == departmentFilter;
+                
+                // Filtro de status
+                const matchesStatus = !statusFilter || employee.status === statusFilter;
+                
+                // Filtro de tag (implementação simplificada, pois não temos a relação completa aqui)
+                const matchesTag = !tagFilter; // Implementação real precisaria verificar as tags do funcionário
+                
+                return matchesSearch && matchesDepartment && matchesStatus && matchesTag;
+            });
+            
+            renderizarFuncionarios();
+        }
+        
+        // Renderizar funcionários
+        function renderizarFuncionarios() {
+            const employeeList = document.getElementById('employee-list');
+            
+            if (filteredEmployees.length === 0) {
+                employeeList.innerHTML = '<tr><td colspan="5" style="text-align: center;">Nenhum funcionário encontrado</td></tr>';
+                document.getElementById('page-info').textContent = 'Mostrando 0-0 de 0 funcionários';
+                document.getElementById('page-controls').innerHTML = '';
+                return;
+            }
+            
+            // Calcular paginação
+            const totalPages = Math.ceil(filteredEmployees.length / itemsPerPage);
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = Math.min(startIndex + itemsPerPage, filteredEmployees.length);
+            const currentEmployees = filteredEmployees.slice(startIndex, endIndex);
+            
+            // Atualizar informações de página
+            document.getElementById('page-info').textContent = `Mostrando ${startIndex + 1}-${endIndex} de ${filteredEmployees.length} funcionários`;
+            
+            // Renderizar controles de página
+            const pageControls = document.getElementById('page-controls');
+            pageControls.innerHTML = '';
+            
+            // Botão anterior
+            const prevButton = document.createElement('div');
+            prevButton.className = 'page-button';
+            prevButton.textContent = '◀';
+            prevButton.onclick = () => {
+                if (currentPage > 1) {
+                    currentPage--;
+                    renderizarFuncionarios();
+                }
+            };
+            pageControls.appendChild(prevButton);
+            
+            // Botões de página
+            for (let i = 1; i <= totalPages; i++) {
+                const pageButton = document.createElement('div');
+                pageButton.className = `page-button ${i === currentPage ? 'active' : ''}`;
+                pageButton.textContent = i;
+                pageButton.onclick = () => {
+                    currentPage = i;
+                    renderizarFuncionarios();
+                };
+                pageControls.appendChild(pageButton);
+            }
+            
+            // Botão próximo
+            const nextButton = document.createElement('div');
+            nextButton.className = 'page-button';
+            nextButton.textContent = '▶';
+            nextButton.onclick = () => {
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    renderizarFuncionarios();
+                }
+            };
+            pageControls.appendChild(nextButton);
+            
+            // Renderizar lista de funcionários
+            employeeList.innerHTML = '';
+            
+            currentEmployees.forEach(employee => {
+                const departmentName = employee.departamento ? employee.departamento.nome : 'Não atribuído';
+                
+                let statusClass = '';
+                switch (employee.status) {
+                    case 'Ativo':
+                        statusClass = 'status-active';
+                        break;
+                    case 'Inativo':
+                        statusClass = 'status-inactive';
+                        break;
+                    case 'Férias':
+                        statusClass = 'status-vacation';
+                        break;
+                    case 'Licença':
+                        statusClass = 'status-leave';
+                        break;
+                }
+                
+                // Tags (implementação simplificada)
+                const tagsHtml = employee.tags ? 
+                    employee.tags.map(tag => `<span class="tag">${tag.nome}</span>`).join('') : 
+                    '<span class="tag">Sem tags</span>';
+                
+                employeeList.innerHTML += `
+                    <tr>
+                        <td>
+                            <div class="employee-info">
+                                <img src="${employee.foto || 'img/user-avatar.png'}" alt="Avatar" class="employee-avatar">
+                                <div>
+                                    <p class="employee-name">${employee.nome}</p>
+                                    <p class="employee-email">${employee.email}</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td>${departmentName}</td>
+                        <td>${tagsHtml}</td>
+                        <td><span class="status-badge ${statusClass}">${employee.status}</span></td>
+                        <td>
+                            <i class="action-icon" onclick="editarFuncionario(${employee.id})">✏️</i>
+                            <i class="action-icon" onclick="excluirFuncionario(${employee.id})">🗑️</i>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+        
+        // Abrir modal de funcionário
+        function abrirModalFuncionario(id = null) {
+            const modal = document.getElementById('employee-modal');
+            const form = document.getElementById('employee-form');
+            const title = document.getElementById('modal-title');
+            
+            // Limpar formulário
+            form.reset();
+            document.getElementById('employee-id').value = '';
+            
+            if (id) {
+                // Editar funcionário existente
+                title.textContent = 'Editar Funcionário';
+                
+                const employee = employees.find(emp => emp.id === id);
+                if (employee) {
+                    document.getElementById('employee-id').value = employee.id;
+                    document.getElementById('employee-name').value = employee.nome;
+                    document.getElementById('employee-email').value = employee.email;
+                    document.getElementById('employee-phone').value = employee.telefone || '';
+                    document.getElementById('employee-position').value = employee.cargo || '';
+                    document.getElementById('employee-department').value = employee.departamento_id || '';
+                    document.getElementById('employee-hire-date').value = employee.data_contratacao || '';
+                    document.getElementById('employee-status').value = employee.status;
+                    document.getElementById('employee-hours').value = employee.jornada_contratada || '';
+                    document.getElementById('employee-access').value = employee.nivel_acesso;
+                }
+            } else {
+                // Novo funcionário
+                title.textContent = 'Novo Funcionário';
+                document.getElementById('employee-status').value = 'Ativo';
+                document.getElementById('employee-access').value = 'Funcionário';
+            }
+            
+            modal.style.display = 'block';
+        }
+        
+        // Fechar modal
+        function closeModal() {
+            document.getElementById('employee-modal').style.display = 'none';
+        }
+        
+        // Salvar funcionário
+        async function salvarFuncionario() {
+            try {
+                const id = document.getElementById('employee-id').value;
+                const nome = document.getElementById('employee-name').value;
+                const email = document.getElementById('employee-email').value;
+                const senha = document.getElementById('employee-password').value;
+                const telefone = document.getElementById('employee-phone').value;
+                const cargo = document.getElementById('employee-position').value;
+                const departamento_id = document.getElementById('employee-department').value;
+                const data_contratacao = document.getElementById('employee-hire-date').value;
+                const status = document.getElementById('employee-status').value;
+                const jornada_contratada = document.getElementById('employee-hours').value;
+                const nivel_acesso = document.getElementById('employee-access').value;
+                
+                // Validar campos obrigatórios
+                if (!nome || !email) {
+                    alert('Nome e email são obrigatórios');
+                    return;
+                }
+                
+                // Preparar dados
+                const funcionarioData = {
+                    nome,
+                    email,
+                    telefone,
+                    cargo,
+                    departamento_id: departamento_id || null,
+                    data_contratacao: data_contratacao || null,
+                    status,
+                    jornada_contratada: jornada_contratada || null,
+                    nivel_acesso
+                };
+                
+                // Adicionar senha apenas se fornecida
+                if (senha) {
+                    funcionarioData.senha = senha;
+                }
+                
+                let response;
+                
+                if (id) {
+                    // Atualizar funcionário existente
+                    response = await fetch(`/api/funcionarios/${id}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${localStorage.getItem('token')}`
+                        },
+                        body: JSON.stringify(funcionarioData)
+                    });
+                } else {
+                    // Criar novo funcionário
+                    if (!senha) {
+                        alert('Senha é obrigatória para novos funcionários');
+                        return;
+                    }
+                    
+                    response = await fetch('/api/funcionarios', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${localStorage.getItem('token')}`
+                        },
+                        body: JSON.stringify(funcionarioData)
+                    });
+                }
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.mensagem || 'Erro ao salvar funcionário');
+                }
+                
+                // Fechar modal e recarregar funcionários
+                closeModal();
+                await carregarFuncionarios();
+                
+                alert(id ? 'Funcionário atualizado com sucesso' : 'Funcionário criado com sucesso');
+            } catch (error) {
+                console.error('Erro ao salvar funcionário:', error);
+                alert(`Erro ao salvar funcionário: ${error.message}`);
+            }
+        }
+        
+        // Editar funcionário
+        function editarFuncionario(id) {
+            abrirModalFuncionario(id);
+        }
+        
+        // Excluir funcionário
+        async function excluirFuncionario(id) {
+            if (!confirm('Tem certeza que deseja excluir este funcionário?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/funcionarios/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.mensagem || 'Erro ao excluir funcionário');
+                }
+                
+                await carregarFuncionarios();
+                alert('Funcionário excluído com sucesso');
+            } catch (error) {
+                console.error('Erro ao excluir funcionário:', error);
+                alert(`Erro ao excluir funcionário: ${error.message}`);
+            }
+        }
+        
+        // Exportar funcionários
+        function exportarFuncionarios() {
+            // Implementação simplificada: exportar para CSV
+            let csv = 'Nome,Email,Cargo,Departamento,Status\n';
+            
+            filteredEmployees.forEach(employee => {
+                const departmentName = employee.departamento ? employee.departamento.nome : 'Não atribuído';
+                csv += `"${employee.nome}","${employee.email}","${employee.cargo || ''}","${departmentName}","${employee.status}"\n`;
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.setAttribute('href', url);
+            link.setAttribute('download', 'funcionarios.csv');
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+        
+        // Inicializar página
+        async function inicializar() {
+            // Verificar autenticação
+            await verificarAutenticacao();
+            
+            // Atualizar informações do usuário
+            atualizarInfoUsuario();
+            
+            // Carregar dados
+            await Promise.all([
+                carregarFuncionarios(),
+                carregarDepartamentos(),
+                carregarTags()
+            ]);
+            
+            // Configurar eventos
+            document.getElementById('search-input').addEventListener('input', aplicarFiltros);
+            document.getElementById('filter-department').addEventListener('change', aplicarFiltros);
+            document.getElementById('filter-status').addEventListener('change', aplicarFiltros);
+            document.getElementById('filter-tag').addEventListener('change', aplicarFiltros);
+            
+            document.getElementById('btn-new-employee').addEventListener('click', () => abrirModalFuncionario());
+            document.getElementById('btn-export').addEventListener('click', exportarFuncionarios);
+            document.getElementById('btn-save-employee').addEventListener('click', salvarFuncionario);
+            
+            // Fechar modal ao clicar fora
+            window.onclick = function(event) {
+                const modal = document.getElementById('employee-modal');
+                if (event.target === modal) {
+                    closeModal();
+                }
+            };
+        }
+        
+        // Iniciar quando o DOM estiver carregado
+        document.addEventListener('DOMContentLoaded', inicializar);
+    </script>
+</body>
+</html>
