@@ -1,0 +1,1154 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatórios - Sistema de Controle de Tempo</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .report-filters {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .filter-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .filter-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .filter-input, .filter-select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ecf0f1;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        .filter-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .report-tabs {
+            display: flex;
+            border-bottom: 1px solid #ecf0f1;
+            margin-bottom: 20px;
+        }
+        
+        .report-tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #7f8c8d;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .report-tab.active {
+            color: #3498db;
+            border-bottom-color: #3498db;
+        }
+        
+        .report-tab:hover:not(.active) {
+            color: #2c3e50;
+            border-bottom-color: #ecf0f1;
+        }
+        
+        .report-content {
+            display: none;
+        }
+        
+        .report-content.active {
+            display: block;
+        }
+        
+        .report-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .report-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .report-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .report-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        
+        .report-table th {
+            text-align: left;
+            padding: 12px 15px;
+            background-color: #f8f9fa;
+            color: #7f8c8d;
+            font-weight: 600;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        
+        .report-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        
+        .report-table tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .report-summary {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        
+        .summary-label {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .summary-value {
+            font-weight: 600;
+            color: #3498db;
+        }
+        
+        .chart-container {
+            height: 300px;
+            margin-bottom: 20px;
+        }
+        
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+            font-size: 16px;
+            color: #7f8c8d;
+        }
+        
+        .no-data {
+            text-align: center;
+            padding: 50px;
+            color: #7f8c8d;
+            font-size: 16px;
+        }
+        
+        .tag-filter {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .tag-item {
+            display: inline-flex;
+            align-items: center;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .tag-item.selected {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        .tag-item:not(.selected) {
+            background-color: #f8f9fa;
+            color: #7f8c8d;
+        }
+        
+        .tag-item:hover:not(.selected) {
+            background-color: #ecf0f1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="main-content">
+            <div class="header">
+                <h1 class="page-title">Relatórios</h1>
+                <div id="user-info" class="user-menu">
+                    <!-- Preenchido via JavaScript -->
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="report-filters">
+                    <div class="filter-row">
+                        <div class="filter-group">
+                            <label class="filter-label" for="filter-date-start">Data Início</label>
+                            <input type="date" id="filter-date-start" class="filter-input">
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label class="filter-label" for="filter-date-end">Data Fim</label>
+                            <input type="date" id="filter-date-end" class="filter-input">
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label class="filter-label" for="filter-employee">Funcionário</label>
+                            <select id="filter-employee" class="filter-select">
+                                <option value="">Todos os Funcionários</option>
+                                <!-- Preenchido via JavaScript -->
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="filter-row">
+                        <div class="filter-group">
+                            <label class="filter-label" for="filter-department">Departamento</label>
+                            <select id="filter-department" class="filter-select">
+                                <option value="">Todos os Departamentos</option>
+                                <!-- Preenchido via JavaScript -->
+                            </select>
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label class="filter-label">Tags</label>
+                            <div id="filter-tags" class="tag-filter">
+                                <!-- Preenchido via JavaScript -->
+                            </div>
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label class="filter-label" for="filter-group-by">Agrupar por</label>
+                            <select id="filter-group-by" class="filter-select">
+                                <option value="funcionario">Funcionário</option>
+                                <option value="departamento">Departamento</option>
+                                <option value="dia">Dia</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="filter-actions">
+                        <button id="btn-clear-filters" class="button secondary-button">Limpar Filtros</button>
+                        <button id="btn-generate-report" class="button primary-button">Gerar Relatório</button>
+                    </div>
+                </div>
+                
+                <div class="report-tabs">
+                    <div class="report-tab active" data-tab="hours-worked">Horas Trabalhadas</div>
+                    <div class="report-tab" data-tab="attendance">Presença</div>
+                    <div class="report-tab" data-tab="overtime">Horas Extras</div>
+                </div>
+                
+                <!-- Relatório de Horas Trabalhadas -->
+                <div id="hours-worked-report" class="report-content active">
+                    <div class="report-header">
+                        <div class="report-title">Relatório de Horas Trabalhadas</div>
+                        <div class="report-actions">
+                            <button id="btn-export-hours-worked" class="button secondary-button">
+                                <i>⬇️</i> Exportar
+                            </button>
+                            <button id="btn-print-hours-worked" class="button secondary-button">
+                                <i>🖨️</i> Imprimir
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="hours-worked-summary" class="report-summary">
+                        <!-- Preenchido via JavaScript -->
+                    </div>
+                    
+                    <div id="hours-worked-chart" class="chart-container">
+                        <!-- Gráfico será renderizado aqui -->
+                    </div>
+                    
+                    <div id="hours-worked-content">
+                        <div class="loading">Gere um relatório para visualizar os dados</div>
+                    </div>
+                </div>
+                
+                <!-- Relatório de Presença -->
+                <div id="attendance-report" class="report-content">
+                    <div class="report-header">
+                        <div class="report-title">Relatório de Presença</div>
+                        <div class="report-actions">
+                            <button id="btn-export-attendance" class="button secondary-button">
+                                <i>⬇️</i> Exportar
+                            </button>
+                            <button id="btn-print-attendance" class="button secondary-button">
+                                <i>🖨️</i> Imprimir
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="attendance-summary" class="report-summary">
+                        <!-- Preenchido via JavaScript -->
+                    </div>
+                    
+                    <div id="attendance-chart" class="chart-container">
+                        <!-- Gráfico será renderizado aqui -->
+                    </div>
+                    
+                    <div id="attendance-content">
+                        <div class="loading">Gere um relatório para visualizar os dados</div>
+                    </div>
+                </div>
+                
+                <!-- Relatório de Horas Extras -->
+                <div id="overtime-report" class="report-content">
+                    <div class="report-header">
+                        <div class="report-title">Relatório de Horas Extras</div>
+                        <div class="report-actions">
+                            <button id="btn-export-overtime" class="button secondary-button">
+                                <i>⬇️</i> Exportar
+                            </button>
+                            <button id="btn-print-overtime" class="button secondary-button">
+                                <i>🖨️</i> Imprimir
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="overtime-summary" class="report-summary">
+                        <!-- Preenchido via JavaScript -->
+                    </div>
+                    
+                    <div id="overtime-chart" class="chart-container">
+                        <!-- Gráfico será renderizado aqui -->
+                    </div>
+                    
+                    <div id="overtime-content">
+                        <div class="loading">Gere um relatório para visualizar os dados</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="js/api.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Variáveis globais
+        let employees = [];
+        let departments = [];
+        let tags = [];
+        let selectedTags = [];
+        let currentTab = 'hours-worked';
+        let charts = {};
+        
+        // Verificar autenticação
+        async function verificarAutenticacao() {
+            const autenticado = await window.api.verificarAutenticacao();
+            if (!autenticado) {
+                window.location.href = 'login.html';
+            }
+        }
+        
+        // Atualizar informações do usuário
+        function atualizarInfoUsuario() {
+            const usuario = window.api.obterUsuarioLogado();
+            if (usuario) {
+                document.getElementById('user-info').innerHTML = `
+                    <img src="${usuario.foto || 'img/user-avatar.png'}" alt="Avatar">
+                    <div class="user-info">
+                        <span class="user-name">${usuario.nome}</span>
+                        <span class="user-role">${usuario.cargo || usuario.nivel_acesso}</span>
+                    </div>
+                `;
+            }
+        }
+        
+        // Carregar funcionários
+        async function carregarFuncionarios() {
+            try {
+                const response = await fetch('/api/funcionarios', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.mensagem || 'Erro ao carregar funcionários');
+                }
+                
+                employees = data.funcionarios;
+                
+                // Preencher select de funcionários
+                const filterEmployee = document.getElementById('filter-employee');
+                filterEmployee.innerHTML = '<option value="">Todos os Funcionários</option>';
+                
+                employees.forEach(employee => {
+                    filterEmployee.innerHTML += `<option value="${employee.id}">${employee.nome}</option>`;
+                });
+            } catch (error) {
+                console.error('Erro ao carregar funcionários:', error);
+                alert('Erro ao carregar funcionários. Por favor, tente novamente.');
+            }
+        }
+        
+        // Carregar departamentos
+        async function carregarDepartamentos() {
+            try {
+                const response = await fetch('/api/departamentos', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.mensagem || 'Erro ao carregar departamentos');
+                }
+                
+                departments = data.departamentos;
+                
+                // Preencher select de departamentos
+                const filterDepartment = document.getElementById('filter-department');
+                filterDepartment.innerHTML = '<option value="">Todos os Departamentos</option>';
+                
+                departments.forEach(department => {
+                    filterDepartment.innerHTML += `<option value="${department.id}">${department.nome}</option>`;
+                });
+            } catch (error) {
+                console.error('Erro ao carregar departamentos:', error);
+                alert('Erro ao carregar departamentos. Por favor, tente novamente.');
+            }
+        }
+        
+        // Carregar tags
+        async function carregarTags() {
+            try {
+                const response = await fetch('/api/relatorios/tags', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.mensagem || 'Erro ao carregar tags');
+                }
+                
+                tags = data.tags;
+                
+                // Preencher filtro de tags
+                const filterTags = document.getElementById('filter-tags');
+                filterTags.innerHTML = '';
+                
+                tags.forEach(tag => {
+                    const tagItem = document.createElement('div');
+                    tagItem.className = 'tag-item';
+                    tagItem.dataset.id = tag.id;
+                    tagItem.textContent = tag.nome;
+                    tagItem.style.backgroundColor = tag.cor ? `${tag.cor}20` : '#f8f9fa'; // Cor com 20% de opacidade
+                    tagItem.style.color = tag.cor || '#7f8c8d';
+                    
+                    tagItem.addEventListener('click', () => {
+                        toggleTagSelection(tagItem, tag.id);
+                    });
+                    
+                    filterTags.appendChild(tagItem);
+                });
+            } catch (error) {
+                console.error('Erro ao carregar tags:', error);
+                alert('Erro ao carregar tags. Por favor, tente novamente.');
+            }
+        }
+        
+        // Alternar seleção de tag
+        function toggleTagSelection(tagElement, tagId) {
+            if (tagElement.classList.contains('selected')) {
+                tagElement.classList.remove('selected');
+                selectedTags = selectedTags.filter(id => id !== tagId);
+            } else {
+                tagElement.classList.add('selected');
+                selectedTags.push(tagId);
+            }
+        }
+        
+        // Limpar filtros
+        function limparFiltros() {
+            document.getElementById('filter-date-start').value = '';
+            document.getElementById('filter-date-end').value = '';
+            document.getElementById('filter-employee').value = '';
+            document.getElementById('filter-department').value = '';
+            document.getElementById('filter-group-by').value = 'funcionario';
+            
+            // Limpar seleção de tags
+            document.querySelectorAll('.tag-item.selected').forEach(tag => {
+                tag.classList.remove('selected');
+            });
+            selectedTags = [];
+        }
+        
+        // Gerar relatório
+        async function gerarRelatorio() {
+            const dataInicio = document.getElementById('filter-date-start').value;
+            const dataFim = document.getElementById('filter-date-end').value;
+            const funcionarioId = document.getElementById('filter-employee').value;
+            const departamentoId = document.getElementById('filter-department').value;
+            const agruparPor = document.getElementById('filter-group-by').value;
+            
+            // Validar datas
+            if (!dataInicio || !dataFim) {
+                alert('Por favor, selecione as datas de início e fim');
+                return;
+            }
+            
+            // Mostrar loading
+            document.getElementById(`${currentTab}-content`).innerHTML = '<div class="loading">Carregando relatório...</div>';
+            
+            try {
+                let endpoint = '';
+                let params = new URLSearchParams({
+                    data_inicio: dataInicio,
+                    data_fim: dataFim
+                });
+                
+                if (funcionarioId) {
+                    params.append('funcionario_id', funcionarioId);
+                }
+                
+                if (departamentoId) {
+                    params.append('departamento_id', departamentoId);
+                }
+                
+                if (selectedTags.length > 0) {
+                    params.append('tag_id', selectedTags[0]); // Por simplicidade, usamos apenas a primeira tag selecionada
+                }
+                
+                if (agruparPor) {
+                    params.append('agrupar_por', agruparPor);
+                }
+                
+                // Definir endpoint com base na aba atual
+                switch (currentTab) {
+                    case 'hours-worked':
+                        endpoint = '/api/relatorios/horas-trabalhadas';
+                        break;
+                    case 'attendance':
+                        endpoint = '/api/relatorios/presenca';
+                        break;
+                    case 'overtime':
+                        endpoint = '/api/relatorios/horas-extras';
+                        break;
+                }
+                
+                const response = await fetch(`${endpoint}?${params.toString()}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.mensagem || 'Erro ao gerar relatório');
+                }
+                
+                // Renderizar relatório com base na aba atual
+                switch (currentTab) {
+                    case 'hours-worked':
+                        renderizarRelatorioHorasTrabalhadas(data);
+                        break;
+                    case 'attendance':
+                        renderizarRelatorioPresenca(data);
+                        break;
+                    case 'overtime':
+                        renderizarRelatorioHorasExtras(data);
+                        break;
+                }
+            } catch (error) {
+                console.error('Erro ao gerar relatório:', error);
+                document.getElementById(`${currentTab}-content`).innerHTML = `
+                    <div class="no-data">
+                        Erro ao gerar relatório: ${error.message}
+                    </div>
+                `;
+            }
+        }
+        
+        // Renderizar relatório de horas trabalhadas
+        function renderizarRelatorioHorasTrabalhadas(data) {
+            const content = document.getElementById('hours-worked-content');
+            const summary = document.getElementById('hours-worked-summary');
+            
+            if (!data.relatorio || data.relatorio.length === 0) {
+                content.innerHTML = '<div class="no-data">Nenhum dado encontrado para os filtros selecionados</div>';
+                summary.innerHTML = '';
+                return;
+            }
+            
+            // Renderizar resumo
+            const periodo = `${formatarData(data.periodo.inicio)} a ${formatarData(data.periodo.fim)}`;
+            
+            // Calcular total de horas
+            let totalMinutos = 0;
+            data.relatorio.forEach(item => {
+                totalMinutos += item.total_minutos || 0;
+            });
+            
+            summary.innerHTML = `
+                <div class="summary-row">
+                    <span class="summary-label">Período:</span>
+                    <span class="summary-value">${periodo}</span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-label">Total de Horas:</span>
+                    <span class="summary-value">${formatarMinutosEmHoras(totalMinutos)}</span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-label">Registros:</span>
+                    <span class="summary-value">${data.relatorio.length}</span>
+                </div>
+            `;
+            
+            // Renderizar gráfico
+            renderizarGraficoHorasTrabalhadas(data.relatorio);
+            
+            // Renderizar tabela com base no tipo de agrupamento
+            const agruparPor = document.getElementById('filter-group-by').value;
+            
+            if (agruparPor === 'funcionario') {
+                // Tabela agrupada por funcionário
+                content.innerHTML = `
+                    <table class="report-table">
+                        <thead>
+                            <tr>
+                                <th>Funcionário</th>
+                                <th>Departamento</th>
+                                <th>Total de Horas</th>
+                                <th>Detalhes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${data.relatorio.map(item => `
+                                <tr>
+                                    <td>${item.nome}</td>
+                                    <td>${item.departamento}</td>
+                                    <td>${item.total_horas}</td>
+                                    <td>
+                                        <button class="button small-button" onclick="mostrarDetalhesHorasTrabalhadas(${item.funcionario_id})">
+                                            Ver Detalhes
+                                        </button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+            } else if (agruparPor === 'departamento') {
+                // Tabela agrupada por departamento
+                content.innerHTML = `
+                    <table class="report-table">
+                        <thead>
+                            <tr>
+                                <th>Departamento</th>
+                                <th>Total de Horas</th>
+                                <th>Funcionários</th>
+                                <th>Detalhes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${data.relatorio.map(item => `
+                                <tr>
+                                    <td>${item.nome}</td>
+                                    <td>${item.total_horas}</td>
+                                    <td>${item.funcionarios.length}</td>
+                                    <td>
+                                        <button class="button small-button" onclick="mostrarDetalhesDepartamento(${item.departamento_id})">
+                                            Ver Detalhes
+                                        </button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+            } else if (agruparPor === 'dia') {
+                // Tabela agrupada por dia
+                content.innerHTML = `
+                    <table class="report-table">
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Total de Horas</th>
+                                <th>Funcionários</th>
+                                <th>Detalhes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${data.relatorio.map(item => `
+                                <tr>
+                                    <td>${formatarData(item.data)}</td>
+                                    <td>${item.total_horas}</td>
+                                    <td>${item.funcionarios.length}</td>
+                                    <td>
+                                        <button class="button small-button" onclick="mostrarDetalhesDia('${item.data}')">
+                                            Ver Detalhes
+                                        </button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+            }
+        }
+        
+        // Renderizar gráfico de horas trabalhadas
+        function renderizarGraficoHorasTrabalhadas(dados) {
+            const ctx = document.getElementById('hours-worked-chart');
+            
+            // Destruir gráfico anterior se existir
+            if (charts.horasTrabalhadas) {
+                charts.horasTrabalhadas.destroy();
+            }
+            
+            // Preparar dados para o gráfico
+            const agruparPor = document.getElementById('filter-group-by').value;
+            let labels = [];
+            let values = [];
+            
+            if (agruparPor === 'funcionario') {
+                // Gráfico por funcionário (top 10)
+                const dadosOrdenados = [...dados].sort((a, b) => b.total_minutos - a.total_minutos).slice(0, 10);
+                
+                labels = dadosOrdenados.map(item => item.nome);
+                values = dadosOrdenados.map(item => item.total_minutos / 60); // Converter para horas
+            } else if (agruparPor === 'departamento') {
+                // Gráfico por departamento
+                labels = dados.map(item => item.nome);
+                values = dados.map(item => item.total_minutos / 60); // Converter para horas
+            } else if (agruparPor === 'dia') {
+                // Gráfico por dia
+                labels = dados.map(item => formatarData(item.data));
+                values = dados.map(item => item.total_minutos / 60); // Converter para horas
+            }
+            
+            // Criar gráfico
+            charts.horasTrabalhadas = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Horas Trabalhadas',
+                        data: values,
+                        backgroundColor: 'rgba(52, 152, 219, 0.7)',
+                        borderColor: 'rgba(52, 152, 219, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Horas'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Renderizar relatório de presença
+        function renderizarRelatorioPresenca(data) {
+            const content = document.getElementById('attendance-content');
+            const summary = document.getElementById('attendance-summary');
+            
+            if (!data.relatorio || data.relatorio.length === 0) {
+                content.innerHTML = '<div class="no-data">Nenhum dado encontrado para os filtros selecionados</div>';
+                summary.innerHTML = '';
+                return;
+            }
+            
+            // Renderizar resumo
+            const periodo = `${formatarData(data.periodo.inicio)} a ${formatarData(data.periodo.fim)}`;
+            const diasUteis = data.periodo.dias_uteis;
+            
+            // Calcular totais
+            let totalPresencas = 0;
+            let totalFaltas = 0;
+            
+            data.relatorio.forEach(item => {
+                totalPresencas += item.estatisticas.presencas;
+                totalFaltas += item.estatisticas.faltas;
+            });
+            
+            const taxaPresencaGeral = diasUteis * data.relatorio.length > 0 ? 
+                ((totalPresencas / (diasUteis * data.relatorio.length)) * 100).toFixed(2) + '%' : 
+                '0%';
+            
+            summary.innerHTML = `
+                <div class="summary-row">
+                    <span class="summary-label">Período:</span>
+                    <span class="summary-value">${periodo}</span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-label">Dias Úteis:</span>
+                    <span class="summary-value">${diasUteis}</span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-label">Taxa de Presença:</span>
+                    <span class="summary-value">${taxaPresencaGeral}</span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-label">Funcionários:</span>
+                    <span class="summary-value">${data.relatorio.length}</span>
+                </div>
+            `;
+            
+            // Renderizar gráfico
+            renderizarGraficoPresenca(data.relatorio);
+            
+            // Renderizar tabela
+            content.innerHTML = `
+                <table class="report-table">
+                    <thead>
+                        <tr>
+                            <th>Funcionário</th>
+                            <th>Departamento</th>
+                            <th>Presenças</th>
+                            <th>Faltas</th>
+                            <th>Taxa de Presença</th>
+                            <th>Detalhes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${data.relatorio.map(item => `
+                            <tr>
+                                <td>${item.funcionario.nome}</td>
+                                <td>${item.funcionario.departamento}</td>
+                                <td>${item.estatisticas.presencas}</td>
+                                <td>${item.estatisticas.faltas}</td>
+                                <td>${item.estatisticas.taxa_presenca}</td>
+                                <td>
+                                    <button class="button small-button" onclick="mostrarDetalhesPresenca(${item.funcionario.id})">
+                                        Ver Detalhes
+                                    </button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+        
+        // Renderizar gráfico de presença
+        function renderizarGraficoPresenca(dados) {
+            const ctx = document.getElementById('attendance-chart');
+            
+            // Destruir gráfico anterior se existir
+            if (charts.presenca) {
+                charts.presenca.destroy();
+            }
+            
+            // Preparar dados para o gráfico (top 10 funcionários por taxa de presença)
+            const dadosOrdenados = [...dados]
+                .sort((a, b) => parseFloat(b.estatisticas.taxa_presenca) - parseFloat(a.estatisticas.taxa_presenca))
+                .slice(0, 10);
+            
+            const labels = dadosOrdenados.map(item => item.funcionario.nome);
+            const values = dadosOrdenados.map(item => parseFloat(item.estatisticas.taxa_presenca));
+            
+            // Criar gráfico
+            charts.presenca = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Taxa de Presença (%)',
+                        data: values,
+                        backgroundColor: 'rgba(46, 204, 113, 0.7)',
+                        borderColor: 'rgba(46, 204, 113, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            title: {
+                                display: true,
+                                text: 'Taxa de Presença (%)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Renderizar relatório de horas extras
+        function renderizarRelatorioHorasExtras(data) {
+            const content = document.getElementById('overtime-content');
+            const summary = document.getElementById('overtime-summary');
+            
+            if (!data.relatorio || data.relatorio.length === 0) {
+                content.innerHTML = '<div class="no-data">Nenhum dado encontrado para os filtros selecionados</div>';
+                summary.innerHTML = '';
+                return;
+            }
+            
+            // Renderizar resumo
+            const periodo = `${formatarData(data.periodo.inicio)} a ${formatarData(data.periodo.fim)}`;
+            
+            // Calcular total de horas extras
+            let totalMinutosExtras = 0;
+            data.relatorio.forEach(item => {
+                totalMinutosExtras += item.total_minutos_extras || 0;
+            });
+            
+            summary.innerHTML = `
+                <div class="summary-row">
+                    <span class="summary-label">Período:</span>
+                    <span class="summary-value">${periodo}</span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-label">Total de Horas Extras:</span>
+                    <span class="summary-value">${formatarMinutosEmHoras(totalMinutosExtras)}</span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-label">Funcionários com Horas Extras:</span>
+                    <span class="summary-value">${data.relatorio.length}</span>
+                </div>
+            `;
+            
+            // Renderizar gráfico
+            renderizarGraficoHorasExtras(data.relatorio);
+            
+            // Renderizar tabela
+            content.innerHTML = `
+                <table class="report-table">
+                    <thead>
+                        <tr>
+                            <th>Funcionário</th>
+                            <th>Departamento</th>
+                            <th>Jornada Contratada</th>
+                            <th>Horas Extras</th>
+                            <th>Detalhes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${data.relatorio.map(item => `
+                            <tr>
+                                <td>${item.funcionario.nome}</td>
+                                <td>${item.funcionario.departamento}</td>
+                                <td>${item.funcionario.jornada_contratada}h/semana</td>
+                                <td>${item.total_horas_extras}</td>
+                                <td>
+                                    <button class="button small-button" onclick="mostrarDetalhesHorasExtras(${item.funcionario.id})">
+                                        Ver Detalhes
+                                    </button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+        
+        // Renderizar gráfico de horas extras
+        function renderizarGraficoHorasExtras(dados) {
+            const ctx = document.getElementById('overtime-chart');
+            
+            // Destruir gráfico anterior se existir
+            if (charts.horasExtras) {
+                charts.horasExtras.destroy();
+            }
+            
+            // Preparar dados para o gráfico (top 10 funcionários por horas extras)
+            const dadosOrdenados = [...dados]
+                .sort((a, b) => b.total_minutos_extras - a.total_minutos_extras)
+                .slice(0, 10);
+            
+            const labels = dadosOrdenados.map(item => item.funcionario.nome);
+            const values = dadosOrdenados.map(item => item.total_minutos_extras / 60); // Converter para horas
+            
+            // Criar gráfico
+            charts.horasExtras = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Horas Extras',
+                        data: values,
+                        backgroundColor: 'rgba(231, 76, 60, 0.7)',
+                        borderColor: 'rgba(231, 76, 60, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Horas Extras'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Mostrar detalhes de horas trabalhadas (implementação simplificada)
+        function mostrarDetalhesHorasTrabalhadas(funcionarioId) {
+            alert(`Detalhes de horas trabalhadas para o funcionário ID ${funcionarioId}`);
+            // Implementação real abriria um modal com detalhes por dia
+        }
+        
+        // Mostrar detalhes de departamento (implementação simplificada)
+        function mostrarDetalhesDepartamento(departamentoId) {
+            alert(`Detalhes de horas trabalhadas para o departamento ID ${departamentoId}`);
+            // Implementação real abriria um modal com detalhes por funcionário
+        }
+        
+        // Mostrar detalhes de dia (implementação simplificada)
+        function mostrarDetalhesDia(data) {
+            alert(`Detalhes de horas trabalhadas para o dia ${formatarData(data)}`);
+            // Implementação real abriria um modal com detalhes por funcionário
+        }
+        
+        // Mostrar detalhes de presença (implementação simplificada)
+        function mostrarDetalhesPresenca(funcionarioId) {
+            alert(`Detalhes de presença para o funcionário ID ${funcionarioId}`);
+            // Implementação real abriria um modal com detalhes por dia
+        }
+        
+        // Mostrar detalhes de horas extras (implementação simplificada)
+        function mostrarDetalhesHorasExtras(funcionarioId) {
+            alert(`Detalhes de horas extras para o funcionário ID ${funcionarioId}`);
+            // Implementação real abriria um modal com detalhes por dia
+        }
+        
+        // Exportar relatório (implementação simplificada)
+        function exportarRelatorio(tipo) {
+            alert(`Exportando relatório de ${tipo}`);
+            // Implementação real geraria um arquivo CSV ou PDF
+        }
+        
+        // Imprimir relatório (implementação simplificada)
+        function imprimirRelatorio(tipo) {
+            alert(`Imprimindo relatório de ${tipo}`);
+            // Implementação real abriria a janela de impressão
+        }
+        
+        // Formatar data
+        function formatarData(dataString) {
+            if (!dataString) return '';
+            const data = new Date(dataString);
+            return data.toLocaleDateString('pt-BR');
+        }
+        
+        // Formatar minutos em horas
+        function formatarMinutosEmHoras(minutos) {
+            const horas = Math.floor(minutos / 60);
+            const minutosRestantes = minutos % 60;
+            return `${horas}h ${minutosRestantes}m`;
+        }
+        
+        // Inicializar página
+        async function inicializar() {
+            // Verificar autenticação
+            await verificarAutenticacao();
+            
+            // Atualizar informações do usuário
+            atualizarInfoUsuario();
+            
+            // Carregar dados
+            await Promise.all([
+                carregarFuncionarios(),
+                carregarDepartamentos(),
+                carregarTags()
+            ]);
+            
+            // Configurar eventos
+            document.getElementById('btn-clear-filters').addEventListener('click', limparFiltros);
+            document.getElementById('btn-generate-report').addEventListener('click', gerarRelatorio);
+            
+            // Configurar eventos de exportação e impressão
+            document.getElementById('btn-export-hours-worked').addEventListener('click', () => exportarRelatorio('horas-trabalhadas'));
+            document.getElementById('btn-print-hours-worked').addEventListener('click', () => imprimirRelatorio('horas-trabalhadas'));
+            document.getElementById('btn-export-attendance').addEventListener('click', () => exportarRelatorio('presenca'));
+            document.getElementById('btn-print-attendance').addEventListener('click', () => imprimirRelatorio('presenca'));
+            document.getElementById('btn-export-overtime').addEventListener('click', () => exportarRelatorio('horas-extras'));
+            document.getElementById('btn-print-overtime').addEventListener('click', () => imprimirRelatorio('horas-extras'));
+            
+            // Configurar abas
+            document.querySelectorAll('.report-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // Atualizar aba ativa
+                    document.querySelectorAll('.report-tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    
+                    // Atualizar conteúdo ativo
+                    const tabId = tab.dataset.tab;
+                    currentTab = tabId;
+                    
+                    document.querySelectorAll('.report-content').forEach(content => {
+                        content.classList.remove('active');
+                    });
+                    
+                    document.getElementById(`${tabId}-report`).classList.add('active');
+                });
+            });
+            
+            // Definir datas padrão (mês atual)
+            const hoje = new Date();
+            const primeiroDiaMes = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+            const ultimoDiaMes = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0);
+            
+            document.getElementById('filter-date-start').value = primeiroDiaMes.toISOString().split('T')[0];
+            document.getElementById('filter-date-end').value = ultimoDiaMes.toISOString().split('T')[0];
+        }
+        
+        // Iniciar quando o DOM estiver carregado
+        document.addEventListener('DOMContentLoaded', inicializar);
+    </script>
+</body>
+</html>
